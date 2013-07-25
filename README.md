@@ -1,7 +1,7 @@
 pytwitterme
 ===========
 
-my inspiration came from Joe, saying to me that twitter uses Redis :)
+my inspiration came from Joey, saying to me that twitter uses Redis :)
 
 Design:
     Simple as it can be:
