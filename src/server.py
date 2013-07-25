@@ -1,8 +1,11 @@
-
+"""
+Simple Server implementation , mostly taken from internet examples ( SimpleHttpServer )
+Http interface based exact on api provided in exercise definition ( including typos)
+"""
 
 import sys
 import BaseHTTPServer
-from logging import info, error
+from logging import info, error, exception
 
 import logging.config
 logging.config.fileConfig('logging.conf')
@@ -21,9 +24,14 @@ class MyHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         try:
             o = urlparse.urlparse(self.path)
-
             cmdName = o.path.replace("/","")
             params = urlparse.parse_qs(o.query)
+        except Exception as ex:
+            exception(ex)
+            self.send_error(404,'Failed to parse url: %s' % self.path)
+            return
+
+        try:
             if  cmdName == "CreateUser" :
                 self.send_Response(  facade.createUser( params["UserName"][0] ) )
             elif cmdName == "PostMessage":
@@ -39,9 +47,10 @@ class MyHandler(BaseHTTPRequestHandler):
             else:
                  self.send_error(404,'Non Supported command: %s' % self.path)
             return
-
-        except Exception:
-            self.send_error(404,'Failed to execute: %s' % self.path)
+        except Exception as ex:
+            error( 'Failed to execute: %s  %s  from %s' % (cmdName, params, self.path))
+            exception(ex)
+            self.send_error(404,'Failed to execute: %s  %s  from %s' % (cmdName, params, self.path))
 
 
     def send_Response(self, response):
@@ -58,13 +67,10 @@ class MyHandler(BaseHTTPRequestHandler):
 
 def main():
     if len( sys.argv) ==3:
-	server_ip = sys.argv[1]        
-	port = int(sys.argv[2])
+        server_address = ( sys.argv[1],  int(sys.argv[2]))
     else:
-	server_ip='127.0.0.1'
-        port = 8000
+        server_address = ('127.0.0.1', 8000)
 
-    server_address = (server_ip, port)
 
     MyHandler.protocol_version = Protocol
     httpd =  BaseHTTPServer.HTTPServer(server_address, MyHandler)

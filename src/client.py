@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Simple client for testing
+Simple client for testing ( windows, use wget in linux :)
 """
 
 import httplib
@@ -14,14 +14,14 @@ if (len(sys.argv) == 2 ):
 conn = httplib.HTTPConnection(http_server)
 
 while 1:
-    cmd = raw_input('input command (ex. GET index.html): ')
-    cmd = cmd.split()
+    cmdStr = raw_input('input command (ex. GET index.html): ')
+    cmd = cmdStr.split()
 
     if cmd[0] == 'exit': #tipe exit to end it
         break
     
     #request command to server
-    conn.request(cmd[0], cmd[1])
+    conn.request(cmd[0], cmdStr[len(cmd[0]):])
 
     #get response from server
     rsp = conn.getresponse()
