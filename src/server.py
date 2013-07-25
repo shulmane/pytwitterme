@@ -22,7 +22,7 @@ class MyHandler(BaseHTTPRequestHandler):
         try:
             o = urlparse.urlparse(self.path)
 
-            cmdName = o.path
+            cmdName = o.path.replace("/","")
             params = urlparse.parse_qs(o.query)
             if  cmdName == "CreateUser" :
                 self.send_Response(  facade.createUser( params["UserName"][0] ) )
@@ -57,11 +57,14 @@ class MyHandler(BaseHTTPRequestHandler):
 
 
 def main():
-    if sys.argv[1:]:
-        port = int(sys.argv[1])
+    if len( sys.argv) ==3:
+	server_ip = sys.argv[1]        
+	port = int(sys.argv[2])
     else:
+	server_ip='127.0.0.1'
         port = 8000
-    server_address = ('127.0.0.1', port)
+
+    server_address = (server_ip, port)
 
     MyHandler.protocol_version = Protocol
     httpd =  BaseHTTPServer.HTTPServer(server_address, MyHandler)
